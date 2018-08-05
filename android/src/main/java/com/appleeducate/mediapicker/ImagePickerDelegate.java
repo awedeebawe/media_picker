@@ -257,7 +257,7 @@ public class ImagePickerDelegate
 
   private void launchPickImageFromGalleryIntent() {
     Intent pickImageIntent = new Intent(Intent.ACTION_GET_CONTENT);
-    pickImageIntent.setType("image/*");
+    pickImageIntent.setType("video/*");
 
     activity.startActivityForResult(pickImageIntent, REQUEST_CODE_CHOOSE_FROM_GALLERY);
   }

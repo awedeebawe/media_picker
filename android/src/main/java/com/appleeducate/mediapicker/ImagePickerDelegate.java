@@ -330,7 +330,7 @@ public class ImagePickerDelegate
 
     if (requestCode == REQUEST_EXTERNAL_STORAGE_PERMISSION) {
       if (permissionGranted) {
-        launchPickImageFromGalleryIntent();
+        launchPickVideoFromGalleryIntent();
       } else {
         finishWithSuccess(null);
       }

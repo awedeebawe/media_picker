@@ -195,7 +195,7 @@ public class ImagePickerDelegate
     }
 
     if (!permissionManager.isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-        if(permissionManager.isRationaleShowable()) {
+        if(permissionManager.isRationaleShowable(Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
             permissionManager.askForPermission(
                     Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_EXTERNAL_STORAGE_PERMISSION);

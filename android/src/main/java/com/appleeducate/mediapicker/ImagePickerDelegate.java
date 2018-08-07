@@ -81,10 +81,10 @@ public class ImagePickerDelegate
   private final FileUtils fileUtils;
 
   interface PermissionManager {
-    boolean isPermissionGranted(String permissionName);
-    boolean isRationaleShowable(String permissionName);
-
-    void askForPermission(String permissionName, int requestCode);
+      boolean isPermissionGranted(String permissionName);
+      boolean isPermissionDenied(String permissionName);
+      boolean isRationaleShowable(String permissionName);
+      void askForPermission(String permissionName, int requestCode);
   }
 
   interface IntentResolver {
@@ -114,11 +114,17 @@ public class ImagePickerDelegate
         null,
         null,
         new PermissionManager() {
-          @Override
-          public boolean isPermissionGranted(String permissionName) {
-            return ActivityCompat.checkSelfPermission(activity, permissionName)
-                == PackageManager.PERMISSION_GRANTED;
-          }
+            @Override
+            public boolean isPermissionGranted(String permissionName) {
+                return ActivityCompat.checkSelfPermission(activity, permissionName)
+                        == PackageManager.PERMISSION_GRANTED;
+            }
+
+            @Override
+            public boolean isPermissionDenied(String permissionName) {
+                return ActivityCompat.checkSelfPermission(activity, permissionName)
+                        == PackageManager.PERMISSION_DENIED;
+            }
 
           @Override
           public boolean isRationaleShowable(String permissionName) {
@@ -195,12 +201,12 @@ public class ImagePickerDelegate
     }
 
     if (!permissionManager.isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-        if(permissionManager.isRationaleShowable(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
+        if(permissionManager.isPermissionDenied(Manifest.permission.READ_EXTERNAL_STORAGE)
+                && !permissionManager.isRationaleShowable(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            handleResult("file://permissions~not~granted");
+        } else {
             permissionManager.askForPermission(
                     Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_EXTERNAL_STORAGE_PERMISSION);
-        } else {
-            handleResult("//permissions~not~granted");
         }
       return;
     }
@@ -403,7 +409,7 @@ public class ImagePickerDelegate
       Double maxWidth = methodCall.argument("maxWidth");
       Double maxHeight = methodCall.argument("maxHeight");
 
-      if(path != "//permissions~not~granted") {
+      if(path != "file://permissions~not~granted") {
           String finalImagePath = imageResizer.resizeImageIfNeeded(path, maxWidth, maxHeight);
           finishWithSuccess(finalImagePath);
       } else {

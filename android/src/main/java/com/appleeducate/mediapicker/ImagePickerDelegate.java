@@ -82,6 +82,7 @@ public class ImagePickerDelegate
 
   interface PermissionManager {
     boolean isPermissionGranted(String permissionName);
+    boolean isRationaleShowable(String permissionName);
 
     void askForPermission(String permissionName, int requestCode);
   }
@@ -117,6 +118,11 @@ public class ImagePickerDelegate
           public boolean isPermissionGranted(String permissionName) {
             return ActivityCompat.checkSelfPermission(activity, permissionName)
                 == PackageManager.PERMISSION_GRANTED;
+          }
+
+          @Override
+          public boolean isRationaleShowable(String permissionName) {
+            return ActivityCompat.shouldShowRequestPermissionRationale(activity, permissionName);
           }
 
           @Override
@@ -189,8 +195,13 @@ public class ImagePickerDelegate
     }
 
     if (!permissionManager.isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-      permissionManager.askForPermission(
-          Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_EXTERNAL_STORAGE_PERMISSION);
+        if(permissionManager.isRationaleShowable()) {
+
+            permissionManager.askForPermission(
+                    Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_EXTERNAL_STORAGE_PERMISSION);
+        } else {
+            handleResult("//permissions~not~granted");
+        }
       return;
     }
 
@@ -392,8 +403,12 @@ public class ImagePickerDelegate
       Double maxWidth = methodCall.argument("maxWidth");
       Double maxHeight = methodCall.argument("maxHeight");
 
-      String finalImagePath = imageResizer.resizeImageIfNeeded(path, maxWidth, maxHeight);
-      finishWithSuccess(finalImagePath);
+      if(path != "//permissions~not~granted") {
+          String finalImagePath = imageResizer.resizeImageIfNeeded(path, maxWidth, maxHeight);
+          finishWithSuccess(finalImagePath);
+      } else {
+          finishWithSuccess(path);
+      }
     } else {
       throw new IllegalStateException("Received images from picker that were not requested");
     }

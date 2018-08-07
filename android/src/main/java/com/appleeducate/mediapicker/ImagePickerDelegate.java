@@ -202,7 +202,7 @@ public class ImagePickerDelegate
 
     if (!permissionManager.isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
         if(permissionManager.isPermissionDenied(Manifest.permission.READ_EXTERNAL_STORAGE)
-                && !permissionManager.isRationaleShowable(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                && permissionManager.isRationaleShowable(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             handleResult("file://permissions~not~granted");
         } else {
             permissionManager.askForPermission(
